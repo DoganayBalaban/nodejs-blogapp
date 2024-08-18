@@ -5,7 +5,7 @@ const app = express();
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const SequelizeStore = require("connect-session-sequelize")(session.Store);
-
+require("dotenv").config();
 //node modules
 const path = require("path");
 
