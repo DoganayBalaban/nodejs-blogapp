@@ -1,0 +1,15 @@
+           <!-- pagination -->
+
+<% if (totalPages > 1) { %>
+
+    <nav>
+        <ul class="pagination justify-content-center">
+            <% for( let i = 0; i < totalPages; i++ ) { %>
+                <li class="page-item ">
+                    <a href="?page=<%= i %>" class="page-link <%= (i == currentPages) ? "active":"" %>"><%= i + 1 %></a>
+                </li>
+            <% } %>
+        </ul>
+    </nav>
+
+<% } %>
