@@ -1,5 +1,7 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
+const emailService = require("../helpers/send-mail");
+const config = require("../config");
 exports.get_register = async function (req, res) {
   try {
     return res.render("auth/register", {
@@ -17,16 +19,27 @@ exports.post_register = async function (req, res) {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ where: { email: email } });
     if (user) {
-      req.session.message = "Böyle bir email sistemde mevcut";
+      req.session.message = {
+        text: "Böyle bir email sistemde mevcut",
+        class: "warning",
+      };
       return res.redirect("login");
     }
-    await User.create({
+    const newUser = await User.create({
       fullname: name,
       email: email,
       password: hashedPassword,
     });
+    emailService.sendMail({
+      from: config.email.from,
+      to: newUser.email,
+      subject: "Hesabınız oluştuurldu",
+      text: `Merhaba ${newUser.fullname} hesabınız oluşturuldu
+      `,
+    });
+    req.session.message = { text: "Kayıt Başarılı", class: "success" };
     return res.redirect("login");
   } catch (err) {
     console.log(err);
@@ -35,6 +48,7 @@ exports.post_register = async function (req, res) {
 
 exports.get_login = async function (req, res) {
   const message = req.session.message;
+  delete req.session.message;
   try {
     return res.render("auth/login", {
       title: "login",
@@ -67,7 +81,7 @@ exports.post_login = async function (req, res) {
     if (!user) {
       return res.render("auth/login", {
         title: "login",
-        message: "email hatalı",
+        message: { text: "Email Hatalı", class: "danger" },
       });
     }
 
@@ -84,7 +98,7 @@ exports.post_login = async function (req, res) {
 
     return res.render("auth/login", {
       title: "login",
-      message: "parola hatalı",
+      message: { text: "Parola Hatalı", class: "danger" },
     });
   } catch (err) {
     console.log(err);

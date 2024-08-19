@@ -2,6 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const isAuth = require("../middlewares/isAuth");
+const csrf = require("../middlewares/csrf");
 
 const imageUpload = require("../helpers/image-upload");
 
@@ -10,7 +11,12 @@ const adminController = require("../controllers/admin");
 //"/blog/delete/:blogid" yönlendirici işlevi, belirtilen blog kimliğini alır ve ilgili blogu bulur.
 //Eğer blog bulunursa, "admin/blog-delete" şablonunu render eder ve ilgili blogu vererek silme işlemi için onay sayfasını gösterir.
 //Aksi takdirde, "/admin/blogs" sayfasına yönlendirme yapar:
-router.get("/blog/delete/:blogid", isAuth, adminController.get_blog_delete);
+router.get(
+  "/blog/delete/:blogid",
+  isAuth,
+  csrf,
+  adminController.get_blog_delete
+);
 
 //"/blog/delete/:blogid" POST yönlendirici işlevi, belirtilen blog kimliğini alır ve ilgili blogu bulur.
 //Eğer blog bulunursa, destroy() fonksiyonunu kullanarak blogu veritabanından siler
@@ -22,6 +28,7 @@ router.post("/blog/delete/:blogid", isAuth, adminController.post_blog_delete);
 //ve ilgili kategoriyi vererek silme işlemi için onay sayfasını gösterir. Aksi takdirde, "/admin/categories" sayfasına yönlendirme yapar:
 router.get(
   "/category/delete/:categoryid",
+  csrf,
   isAuth,
   adminController.get_category_delete
 );
@@ -36,7 +43,7 @@ router.post(
 
 //"/blog/create" yönlendirici işlevi, tüm kategorileri alır ve "admin/blog-create" şablonunu render eder,
 //yeni bir blog eklemek için gereken verileri kullanarak sayfayı oluşturur:
-router.get("/blog/create", isAuth, adminController.get_blog_create);
+router.get("/blog/create", isAuth, csrf, adminController.get_blog_create);
 
 router.post("/categories/remove", isAuth, adminController.get_category_remove);
 
@@ -52,7 +59,12 @@ router.post(
 
 ///category/create yolunda bir GET yönlendiricisi tanımlanır.
 //Bu yönlendirici, yeni bir kategori eklemek için gereken verileri alarak kategori oluşturma sayfasını render eder:
-router.get("/category/create", isAuth, adminController.get_category_create);
+router.get(
+  "/category/create",
+  csrf,
+  isAuth,
+  adminController.get_category_create
+);
 
 ///category/create yolunda bir POST yönlendiricisi tanımlanır.
 //Bu yönlendirici, kullanıcının gönderdiği verileri kullanarak yeni bir kategori oluşturur:
@@ -60,7 +72,7 @@ router.post("/category/create", isAuth, adminController.post_category_create);
 
 //blogs/:blogid yolunda bir GET yönlendiricisi tanımlanır. Bu yönlendirici, belirtilen blog kimliğini alır ve ilgili blogu bulur.
 //Blog bulunursa, "admin/blog-edit" şablonunu render eder ve ilgili blog verileriyle birlikte sayfayı oluşturur:
-router.get("/blogs/:blogid", isAuth, adminController.get_blog_edit);
+router.get("/blogs/:blogid", isAuth, csrf, adminController.get_blog_edit);
 
 ///blogs/:blogid yolunda bir POST yönlendiricisi tanımlanır.
 //Bu yönlendirici, kullanıcının gönderdiği verileri kullanarak belirli bir blogu günceller:
@@ -77,6 +89,7 @@ router.post(
 router.get(
   "/categories/:categoryid",
   isAuth,
+  csrf,
   adminController.get_category_edit
 );
 

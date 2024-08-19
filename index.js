@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const SequelizeStore = require("connect-session-sequelize")(session.Store);
 require("dotenv").config();
+const csurf = require("csurf");
 //node modules
 const path = require("path");
 
@@ -43,7 +44,9 @@ app.use(
     }),
   })
 );
+app.use(csurf());
 app.use(locals);
+
 //statik dosyaların bulunacağı dizinlerin tanımlanması yapılır.
 //"/libs" yoluyla node_modules klasörü ve "/static" yoluyla public klasörüne istemci tarafından erişilebilir:
 app.use("/libs", express.static(path.join(__dirname, "node_modules")));
