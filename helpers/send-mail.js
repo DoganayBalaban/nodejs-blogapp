@@ -6,8 +6,11 @@ var transporter = nodeMailer.createTransport({
   port: 587,
   secure: false,
   auth: {
-    user: config.email.user,
-    pass: config.email.pass,
+    user: config.email.username,
+    pass: config.email.password,
+  },
+  tls: {
+    rejectUnauthorized: false,
   },
 });
 module.exports = transporter;

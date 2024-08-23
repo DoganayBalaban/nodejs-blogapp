@@ -4,6 +4,7 @@ const Blog = require("../models/blog");
 const slugField = require("../helpers/slugfield");
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
+const Role = require("../models/role");
 //populate adında bir asenkron işlev tanımlanır. Bu işlev, mevcut kategori ve blog sayısını kontrol eder.
 //Eğer sayı 0 ise, başlangıç verilerini eklemek için bulkCreate ve create işlevlerini kullanır:
 async function populate() {
@@ -120,7 +121,26 @@ async function populate() {
         email: "ebalaban1907@gmail.com",
         password: await bcrypt.hash("1234", 10),
       },
+      {
+        fullname: "guest",
+        email: "guest@gmail.com",
+        password: await bcrypt.hash("1234", 10),
+      },
     ]);
+    const roles = await Role.bulkCreate([
+      {
+        rolename: "admin",
+      },
+      {
+        rolename: "guest",
+      },
+      {
+        rolename: "moderatör",
+      },
+    ]);
+    await users[0].addRole(roles[0]);
+    await users[1].addRole(roles[2]);
+    await users[2].addRole(roles[1]);
 
     await categories[0].addBlog(blogs[0]);
     await categories[0].addBlog(blogs[1]);

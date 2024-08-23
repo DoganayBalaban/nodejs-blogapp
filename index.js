@@ -1,35 +1,34 @@
-//express
+// Express ve diğer modüller
 const express = require("express");
 const app = express();
-
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const SequelizeStore = require("connect-session-sequelize")(session.Store);
 require("dotenv").config();
 const csurf = require("csurf");
-//node modules
 const path = require("path");
 
-//routes
+// Routes
 const userRoutes = require("./routes/user");
 const authRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
 
-//custom modules
+// Custom modules
 const sequelize = require("./data/db");
 const dummyData = require("./data/dummy-data");
 const locals = require("./middlewares/locals");
-//template engine
-//Express uygulamasının "ejs" şablon motorunu kullanacağı belirtilir:
+
+// Template engine
 app.set("view engine", "ejs");
 
-//models
+// Models
 const Category = require("./models/category");
 const Blog = require("./models/blog");
 const User = require("./models/user");
+const Role = require("./models/role");
 
-//middleware
-app.use(express.urlencoded({ extended: false }));
+// Middleware
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
   session({
@@ -37,7 +36,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24, // 1gün 1000 milisecond
+      maxAge: 1000 * 60 * 60 * 24, // 1 gün
     },
     store: new SequelizeStore({
       db: sequelize,
@@ -47,21 +46,16 @@ app.use(
 app.use(csurf());
 app.use(locals);
 
-//statik dosyaların bulunacağı dizinlerin tanımlanması yapılır.
-//"/libs" yoluyla node_modules klasörü ve "/static" yoluyla public klasörüne istemci tarafından erişilebilir:
+// Statik dosyalar
 app.use("/libs", express.static(path.join(__dirname, "node_modules")));
 app.use("/static", express.static(path.join(__dirname, "public")));
 
-//"/admin" yoluna gelen isteklerin yönlendirilmesi için "adminRoutes" dosyası kullanılır.
-//Diğer tüm istekler ise "userRoutes" dosyasına yönlendirilir:
+// Routes kullanımı
 app.use("/admin", adminRoutes);
 app.use("/account", authRoutes);
 app.use(userRoutes);
 
-//Sequelize kütüphanesini kullanarak bir veritabanı bağlantısı oluşturulur.
-//Ardından, "dummyData" fonksiyonu aracılığıyla veritabanında bazı örnek veriler oluşturulur:
-
-//ilişkiler
+// İlişkiler
 Blog.belongsTo(User, {
   foreignKey: {
     allowNull: true,
@@ -72,15 +66,16 @@ User.hasMany(Blog);
 Blog.belongsToMany(Category, { through: "blogCategories" });
 Category.belongsToMany(Blog, { through: "blogCategories" });
 
-//uygulanması
+Role.belongsToMany(User, { through: "userRoles" });
+User.belongsToMany(Role, { through: "userRoles" });
 
-//IIFE
+// Sequelize sync ve dummy data
 (async () => {
-  //   await sequelize.sync({ force: true });
-  //   await dummyData();
+  // await sequelize.sync({ force: true });
+  // await dummyData();
 })();
 
-//uygulama belirtilen port (3000) üzerinden dinlemeye başlar:
+// Uygulama belirtilen port (3000) üzerinden dinlemeye başlar
 app.listen(3000, function () {
   console.log("listening on port 3000");
 });
