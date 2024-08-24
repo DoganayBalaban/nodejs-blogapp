@@ -90,8 +90,14 @@ exports.post_login = async function (req, res) {
     const match = await bcrypt.compare(password, user.password);
 
     if (match) {
+      const userRoles = await user.getRoles({
+        attributes: ["rolename"],
+        raw: true,
+      });
+      req.session.roles = userRoles.map((role) => role["rolename"]);
       req.session.isAuth = true;
       req.session.fullname = user.fullname;
+      req.session.userid = user.id;
       return req.session.save(() => {
         const url = req.query.returnUrl || "/";
         res.redirect(url);

@@ -6,15 +6,17 @@
         <a href="/blogs" class="nav-link">Blog Listesi</a>
       </li>
 
-      <% if (isAuth === true) { %>
+      <% if (isAdmin || isModerator) { %>
       <li class="nav-item">
         <a href="/admin/blogs" class="nav-link">Admin Blogları</a>
       </li>
       <li class="nav-item">
-        <a href="/admin/categories" class="nav-link">Admin Kategorileri</a>
-      </li>
-      <li class="nav-item">
         <a href="/admin/blog/create" class="nav-link">Blog Ekle</a>
+      </li>
+      <% } %> <% if (isAdmin) { %>
+
+      <li class="nav-item">
+        <a href="/admin/categories" class="nav-link">Admin Kategorileri</a>
       </li>
       <li class="nav-item">
         <a href="/admin/category/create" class="nav-link">Kategori Ekle</a>
